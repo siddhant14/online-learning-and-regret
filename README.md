@@ -4,7 +4,7 @@ Online learning, Weighted Majority, and regret minimization. Course project by S
 
 ## Current scope
 
-Six-section proposed outline, linked references, and an interactive four-expert simulation. Explanatory chapters and the student-authored proof write-up are still pending and labelled on the website.
+A project outline, motivation, and references on the homepage, with a separate interactive four-expert simulation. The outline describes the planned teaching sections.
 
 ## GitHub Pages
 
@@ -20,7 +20,9 @@ Run `node test-engine.mjs` or `npm test`. There are no dependencies to install.
 
 ## Files
 
-- `index.html`: chapter outline, author prompts, lab markup, and references.
+- `index.html`: motivation, project outline, and references.
+- `simulation.html`: interactive simulation.
+- `site.css`: simple page layout and typography.
 - `style.css`: responsive layout and presentation.
 - `engine.js`: exponential weights, expected-loss and deterministic prediction rules.
 - `app.js`: controls, plots, weight displays, and CSV export.

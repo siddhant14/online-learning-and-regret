@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Simulation — Online Learning and Regret</title>
+<link rel="stylesheet" href="style.css"><link rel="stylesheet" href="site.css">
+<script type="module" src="app.js"></script>
+</head>
+<body>
+<header class="site-header"><nav aria-label="Main navigation"><a href="index.html">Project outline</a><a href="index.html#references">References</a></nav></header>
+<main class="simulation-page">
+<h1>Expert-advice simulation</h1>
+<p class="intro">Choose an outcome sequence, then step through the rounds to see how the experts’ weights change. You can also set the predictions and outcomes yourself.</p>
+<section id="lab" class="lab-section"><div class="wrap">
+<div class="lab-shell">
+<aside class="controls"><div class="panel-label">Experiment setup</div>
+<label for="mode">Prediction rule</label><select id="mode"><option value="hedge">Randomized / Hedge (expected)</option><option value="wm">Deterministic Weighted Majority</option></select>
+<label for="scenario">Outcome sequence</label><select id="scenario"><option value="steady">Steady signal</option><option value="switch">Regime switch halfway</option><option value="alternate">Alternating outcomes</option><option value="adversary">Against the weighted vote</option><option value="manual">Manual predictions & outcome</option></select>
+<div class="range-label"><label for="eta">Learning rate η</label><output id="eta-value" for="eta">0.40</output></div><input type="range" id="eta" min="0.05" max="2" step="0.05" value="0.4"><div class="range-caption"><span>Gradual</span><span>Reactive</span></div><button type="button" id="tune" class="small-link">Use horizon-tuned η</button>
+<div class="range-label horizon-label"><label for="horizon">Rounds T</label><output id="horizon-value" for="horizon">40</output></div><input type="range" id="horizon" min="20" max="200" step="20" value="40">
+<div class="update-rule"><span class="tiny">PENALTY PER MISTAKE</span><div>β = e<sup>−η</sup> = <span id="beta-value">0.6703</span></div></div><p class="control-note">Changing the setup starts a new experiment.</p></aside>
+<div class="experiment"><div class="experiment-top"><span class="panel-label">Cumulative loss</span><span class="round-counter" id="round-counter">Round 00 / 40</span></div>
+<div class="metrics" aria-live="polite" aria-atomic="true"><div><span id="algorithm-label">Expected learner loss</span><strong id="algorithm-value">0.00</strong></div><div><span>Best fixed expert</span><strong id="best-value">0</strong></div><div><span id="regret-label">Expected regret</span><strong id="regret-value">0.00</strong></div></div>
+<div class="chart-box"><svg id="chart" viewBox="0 0 760 280" role="img" aria-labelledby="chart-title chart-desc"><title id="chart-title">Cumulative losses by round</title><desc id="chart-desc">Use the round log for exact accessible values.</desc></svg></div>
+<div class="legend"><span><i class="legend-learner"></i>Learner</span><span><i class="legend-best"></i>Best fixed expert</span><span><i class="legend-uniform"></i>Uniform mixture</span></div>
+<div class="playback"><button id="step" class="button primary" type="button">Next round <span>→</span></button><button id="play" class="button secondary" type="button">Run all <span>▶</span></button><button id="reset" class="reset-button" type="button">↺ Reset</button><span id="play-status" class="play-status" role="status">Ready</span></div>
+<div class="guarantee"><span class="tiny" id="bound-label">REGRET UPPER BOUND</span><span id="bound-formula">ln(4)/η + ηt/8</span><strong id="bound-value">—</strong></div></div></div>
+<div class="round-panel"><div class="round-panel-head"><div><span class="panel-label">Next round / expert advice</span><p id="advice-help">Normalized weights before the next outcome is revealed.</p></div><div class="manual-outcome" id="manual-outcome" hidden><span>Outcome</span><button type="button" data-outcome="0" aria-pressed="true">0</button><button type="button" data-outcome="1" aria-pressed="false">1</button></div></div><div class="experts" id="experts"></div><div class="forecast"><span id="forecast-text"></span><span id="last-result" role="status">No outcomes revealed yet.</span></div></div>
+<details class="log"><summary><span>Round-by-round log</span><span class="log-count" id="log-count">0 rounds</span><span>+</span></summary><div class="log-content"><div class="log-toolbar"><p>Weights and predictions are recorded before each outcome. Regret uses a single fixed expert for each prefix.</p><button id="export" type="button" class="button secondary">Download CSV ↓</button></div><div class="table-scroll"><table><caption class="sr-only">Recorded experiment rounds</caption><thead><tr><th>Round</th><th>Advice A/B/C/D</th><th>Outcome</th><th>P(1)</th><th>Round loss</th><th>Learner total</th><th>Best total</th><th>Regret</th></tr></thead><tbody id="log-body"><tr><td colspan="8">Reveal a round to begin.</td></tr></tbody></table></div></div></details>
+<div class="lab-notes"><div><span class="tiny">WHAT IS MEASURED</span><p id="measurement-note">Hedge displays the weighted average of the experts’ 0–1 losses, equal to randomized prediction’s conditional expected loss. No random expert is sampled.</p></div><div><span class="tiny">COMPARATOR & FEEDBACK</span><p>Best fixed expert = minimum cumulative expert loss, not a fresh expert chosen each round. All expert losses are revealed after every round. Regret can be negative.</p></div></div>
+</div></section>
+
+</main>
+<noscript><p class="simulation-page">Enable JavaScript to run the simulation.</p></noscript>
+</body></html>
