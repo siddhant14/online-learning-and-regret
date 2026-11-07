@@ -1,4 +1,4 @@
-# Learning from Experts
+# Online Learning & Regret
 
 Online learning, Weighted Majority, and regret minimization. Course project by Siddhant Bhargava.
 
