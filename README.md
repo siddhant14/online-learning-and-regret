@@ -1,10 +1,12 @@
 # Online Learning & Regret
 
-Online learning, Weighted Majority, and regret minimization. Course project by Siddhant Bhargava.
+Online learning, multiplicative weights, minimax, and randomized query lower bounds. Course project by Siddhant Bhargava.
 
 ## Current scope
 
-A project outline, motivation, and references on the homepage, with a separate interactive four-expert simulation. The outline describes the planned teaching sections.
+A simple two-part project outline with motivation, prerequisite background, and references. Part 1 develops expert advice and the exponential-weights regret guarantee. Part 2 uses that guarantee to prove finite minimax, derives Yao's fixed-query-budget error identity, and applies it to the randomized query complexity of OR.
+
+The public page describes the planned teaching sections. The final explanations and proofs are to be written by the student. A separate four-expert simulation supports Part 1.
 
 ## GitHub Pages
 

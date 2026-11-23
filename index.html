@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Online Learning and Regret</title>
-<meta name="description" content="A project on online learning, prediction with expert advice, and regret minimization.">
+<meta name="description" content="A project on multiplicative weights, minimax, and lower bounds for randomized algorithms.">
 <link rel="stylesheet" href="site.css">
 </head>
 <body id="top">
@@ -13,31 +13,46 @@
 </header>
 <main class="project-page">
 <h1>Online Learning<br>and Regret</h1>
-<p class="subtitle">Prediction with expert advice and the Weighted Majority algorithm</p>
+<p class="subtitle">From expert advice to lower bounds for randomized algorithms</p>
 <section class="motivation" aria-labelledby="motivation-title">
 <h2 id="motivation-title">Why I chose this topic</h2>
 <p>I've worked with ML models and trading signals before, so I'm interested in how learning algorithms perform when data arrives sequentially and predictions have to be made without knowing what comes next. I want to explore what guarantees we can make even when the data is unpredictable or adversarial.</p>
+<p>I plan to use this as a starting point for studying randomized computation. The project will connect the regret guarantee for multiplicative weights to the minimax theorem, then use Yao’s principle to prove a lower bound on the number of input bits an algorithm must read.</p>
+</section>
+<section class="background" aria-labelledby="background-title">
+<h2 id="background-title">Background</h2>
+<p>I’ll assume basic probability, expectations, asymptotic notation, and the definition of bounded-error randomized computation from 455. I’ll introduce the expert-advice framework, finite zero-sum games, and the query-complexity model as they are needed. No prior ML or game-theory course is assumed.</p>
 </section>
 <section id="outline" aria-labelledby="outline-title">
 <h2 id="outline-title">Proposed outline</h2>
+<section class="outline-part" id="part-one" aria-labelledby="part-one-title">
+<h3 id="part-one-title">Part 1: Online learning and regret</h3>
 <ol class="outline">
-<li id="introduction"><h3>Introduction to online learning</h3><p>I’ll start with a prediction problem where data arrives one round at a time. A simple example will show what the learner knows before making a prediction and what it learns afterward.</p></li>
-<li id="expert-advice"><h3>Prediction with expert advice</h3><p>I’ll introduce the expert-advice framework and define predictions, losses, and cumulative loss. I’ll then explain the comparison with the best expert in hindsight, using a small example.</p></li>
-<li id="weighted-majority"><h3>The Weighted Majority algorithm</h3><p>I’ll describe how the algorithm combines expert predictions and reduces the weights of experts that make mistakes. I’ll work through a few rounds to show how the weights change, then discuss a bound on the algorithm’s mistakes.</p></li>
-<li id="regret"><h3>Randomized prediction and regret</h3><p>I’ll introduce randomized weighted prediction and define expected regret. This section will state a regret bound relative to the best fixed expert and discuss the role of the learning rate.</p></li>
-<li id="proof"><h3>Proof of the regret bound</h3><p>I’ll prove the bound using the total weight of the experts as a potential function. The proof will compare upper and lower bounds on this quantity, then use them to bound regret and choose a learning rate.</p></li>
-<li id="experiments"><h3>Examples and experiments</h3><p>I’ll use stable, alternating, and changing outcome sequences to compare the algorithms. I’ll also discuss what the guarantees do and do not say, including the assumptions about feedback and the choice of comparator.</p><p><a href="simulation.html">Open the expert-advice simulation →</a></p></li>
+<li id="expert-advice"><span id="introduction"></span><h4>The prediction problem</h4><p>I’ll define expert predictions, losses, and regret relative to the best fixed expert in hindsight. A short worked example will show how this comparison differs from choosing a new expert on every round.</p></li>
+<li id="weighted-majority"><h4>Multiplicative weights</h4><p>I’ll introduce Weighted Majority as motivation, then focus on randomized weighted prediction and its expected loss. I’ll explain the weight update and use the simulation to show the effect of the learning rate.</p><p id="experiments"><a href="simulation.html">Open the expert-advice simulation</a></p></li>
+<li id="regret"><span id="proof"></span><h4>The regret bound and its proof</h4><p>I’ll state the exponential-weights guarantee and prove it using the total expert weight as a potential. I’ll explain the upper and lower bounds on that quantity, the choice of learning rate, and the meaning of sublinear regret.</p></li>
 </ol>
+</section>
+<section class="outline-part" id="part-two" aria-labelledby="part-two-title">
+<h3 id="part-two-title">Part 2: Minimax and randomized lower bounds</h3>
+<ol class="outline continued" start="4">
+<li id="games"><h4>Finite zero-sum games</h4><p>I’ll introduce a loss matrix and probability distributions over strategies, using a small game as an example. This will set up the distinction between choosing a randomized strategy and facing a distribution of opposing choices.</p></li>
+<li id="minimax"><h4>Proving the minimax theorem</h4><p>This will be the centerpiece theorem. I’ll run exponential weights against best responses and show how the regret bound makes the gap between the two game values approach zero, completing a proof of minimax equality.</p></li>
+<li id="yao"><h4>Yao’s principle</h4><p>I’ll apply minimax to a matrix whose rows are deterministic algorithms with a fixed query budget and whose columns are inputs. This gives a precise relationship between worst-case error for randomized algorithms and average error for deterministic algorithms under a hard input distribution.</p></li>
+<li id="query-lower-bound"><h4>A lower bound for OR</h4><p>I’ll define decision trees and measure their cost by the number of input bits queried. Using an input distribution supported on the all-zero string and strings with one 1, I’ll prove that a bounded-error randomized algorithm for OR needs linearly many queries, and give a matching asymptotic upper bound.</p></li>
+</ol>
+</section>
 </section>
 <section id="references" aria-labelledby="references-title">
 <h2 id="references-title">References</h2>
 <ul class="references">
 <li><a href="https://cesa-bianchi.di.unimi.it/predbook/">Prediction, Learning, and Games</a>, Nicolò Cesa-Bianchi and Gábor Lugosi. Chapters 2 and 4 cover expert advice and randomized prediction.</li>
 <li><a href="https://www.satyenkale.com/papers/mw-survey.pdf">The Multiplicative Weights Update Method: A Meta-Algorithm and Applications</a>, Sanjeev Arora, Elad Hazan, and Satyen Kale.</li>
-<li><a href="https://www.cs.princeton.edu/courses/archive/fall18/cos521/">Princeton COS 521 lecture notes</a>, particularly the lecture on learning from experts and multiplicative weights.</li>
+<li><a href="https://www.cs.cornell.edu/courses/cs6820/2024fa/handouts/mcflow-spcut.pdf">Cornell CS 6820 notes on multiplicative weights</a>. Section 6 develops minimax using online learning and derives Yao’s lemma.</li>
+<li><a href="https://cs.uwaterloo.ca/~eblais/cs860/w25/minimax">Minimax Principle</a>, Eric Blais. Randomized and distributional complexity.</li>
+<li><a href="https://www.cse.iitk.ac.in/users/rmittal/prev_course/f24/reports/6_yao_randomized.pdf">Yao’s min-max for randomized query complexity</a>, Rajat Mittal. Decision trees and the randomized query complexity of OR.</li>
 </ul>
 </section>
 </main>
 </body>
 </html>
-
