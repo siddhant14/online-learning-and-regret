@@ -1,0 +1,205 @@
+<p class="lead">Suppose several predictors give advice before each outcome is known. We would like to combine their advice without having to identify the best predictor in advance. Multiplicative weights does this by repeatedly changing a probability distribution over the predictors. Its regret guarantee will later become a tool for proving a theorem about randomized algorithms.</p>
+
+<nav class="contents" aria-label="Contents of Part 1">
+<h2>In this part</h2>
+<ol>
+<li><a href="#prediction-game">The prediction game</a></li>
+<li><a href="#regret">What regret measures</a></li>
+<li><a href="#exponential-weights">The weight update</a></li>
+<li><a href="#worked-example">A worked example</a></li>
+<li><a href="#regret-bound">The regret bound</a></li>
+<li><a href="#potential-proof">Proof using total weight</a></li>
+<li><a href="#simulation">Reading the simulation</a></li>
+</ol>
+</nav>
+
+<section id="prediction-game">
+<h2>The prediction game</h2>
+<p>An <dfn id="expert-definition">expert</dfn> is simply a prediction rule. It could be a model, a person, or a rule such as “predict the same outcome as last time.” The mathematical framework does not assume that any expert is especially knowledgeable, or even that one predicts well.</p>
+<p>For a binary prediction problem, the outcome and each expert’s prediction belong to \(\{0,1\}\). On each round:</p>
+<ol>
+<li>The learner receives the experts’ predictions.</li>
+<li>The learner chooses its prediction before seeing the outcome.</li>
+<li>The outcome is revealed, so the learner can determine which experts were wrong.</li>
+<li>The learner updates the influence given to each expert.</li>
+</ol>
+<p>This is a <dfn id="full-information">full-information</dfn> problem: after the outcome, every expert’s loss is available. We do not only observe the loss of the expert we followed.</p>
+<p>It is useful to state the analysis in a slightly more general form. There are \(N\ge2\) experts and \(T\ge1\) rounds. Expert \(i\) receives a loss \(\ell_{i,t}\in[0,1]\) on round \(t\). In the binary example, this loss is 1 for a mistake and 0 for a correct prediction. Allowing fractional losses will let us use the same theorem for a matrix game in <a href="minimax.html#finite-games">Part 2</a>.</p>
+</section>
+
+<section id="regret">
+<h2>What regret measures</h2>
+<p>Without assumptions on the outcomes, expecting few mistakes in absolute terms is too much. Instead, we compare our performance with the available experts. If they all perform poorly, the learner is allowed to perform poorly too.</p>
+<div class="definition" id="cumulative-loss">
+<h3>Cumulative loss and regret</h3>
+<p>The cumulative loss of expert \(i\) is</p>
+\[
+L_{i,T}=\sum_{t=1}^{T}\ell_{i,t}.
+\]
+<p>If the learner uses a probability vector \(p_t=(p_{1,t},\ldots,p_{N,t})\), define its mixture loss by</p>
+\[
+\widehat\ell_t=\sum_{i=1}^{N}p_{i,t}\ell_{i,t},
+\qquad
+\widehat L_T=\sum_{t=1}^{T}\widehat\ell_t.
+\]
+<p>Its <dfn>regret</dfn> against the best fixed expert is</p>
+\[
+R_T=\widehat L_T-\min_{1\le i\le N}L_{i,T}.
+\]
+</div>
+<p>“Fixed” matters. We choose one expert in hindsight and count that expert’s loss over all \(T\) rounds. We do not get to choose a different expert after each outcome. For example, if the expert totals are 10, 14, and 9, then the benchmark is 9. A learner total of 11 gives regret 2.</p>
+<p>Regret can be negative: an adaptive learner may outperform every fixed expert. A small regret also does not imply a small loss. A learner with loss 102 against a best expert with loss 100 has regret 2, even though it still made many mistakes.</p>
+<p>To implement the mixture as a randomized prediction, sample expert \(i\) with probability \(p_{i,t}\) and follow its prediction. Then \(\widehat\ell_t\) is its conditional expected loss. This interpretation assumes that the losses are chosen without seeing the current sampled expert. An opponent may know the probability vector, but cannot wait to see the random choice before choosing the outcome.</p>
+</section>
+
+<section id="exponential-weights">
+<h2>The weight update</h2>
+<p>Start each expert with weight 1. Before a round, normalize the weights into probabilities. After the losses are revealed, multiply an expert’s weight by a factor that decreases with its loss:</p>
+<div class="algorithm">
+<h3>Exponential weights</h3>
+<p>Choose a fixed learning rate \(\eta>0\). Initialize \(w_{i,1}=1\). On each round \(t\), use</p>
+\[
+W_t=\sum_{j=1}^{N}w_{j,t},
+\qquad p_{i,t}=\frac{w_{i,t}}{W_t}.
+\]
+<p>After observing all losses, update</p>
+\[
+w_{i,t+1}=w_{i,t}e^{-\eta\ell_{i,t}}.
+\]
+</div>
+<p>In the binary case, correct experts keep their weights and mistaken experts receive the penalty factor \(\beta=e^{-\eta}\). A larger learning rate makes a mistake more expensive. A smaller rate changes the distribution more gradually.</p>
+<p>Repeated multiplication gives a useful alternative expression:</p>
+\[
+w_{i,t}=e^{-\eta L_{i,t-1}}.
+\]
+<p>The weight before round \(t\) depends only on earlier losses. It does not use the outcome that is about to arrive.</p>
+<h3>How Weighted Majority fits</h3>
+<p>Deterministic Weighted Majority uses a weighted vote: it predicts the label receiving at least half the total weight, with a specified rule for ties. Randomized weighted prediction instead follows a sampled expert. They share the multiplicative update, but their predictions and guarantees differ.</p>
+<p>The distinction is essential against adversarial outcomes. If an opponent always chooses the opposite of a deterministic binary prediction, that learner makes a mistake on every round. Of the always-0 and always-1 experts, at least one makes at most half as many mistakes. Randomization changes which guarantees are possible when the opponent cannot see the current random choice.</p>
+<p>Our main analysis is for exponential weights and its mixture loss. The simulation includes deterministic voting for comparison; its displayed mistake bound is a separate guarantee.</p>
+</section>
+
+<section id="worked-example">
+<h2>A worked example</h2>
+<p>Take four experts, equal starting weights, and \(\eta=\ln 2\). This rate makes the arithmetic convenient: every mistake halves an expert’s weight.</p>
+<div class="table-scroll"><table class="reading-table">
+<caption>First-round advice and the update after outcome 1</caption>
+<thead><tr><th scope="col">Expert</th><th scope="col">Prediction</th><th scope="col">Loss</th><th scope="col">New weight</th><th scope="col">New probability</th></tr></thead>
+<tbody>
+<tr><th scope="row">A</th><td>0</td><td>1</td><td>1/2</td><td>1/5</td></tr>
+<tr><th scope="row">B</th><td>1</td><td>0</td><td>1</td><td>2/5</td></tr>
+<tr><th scope="row">C</th><td>0</td><td>1</td><td>1/2</td><td>1/5</td></tr>
+<tr><th scope="row">D</th><td>0</td><td>1</td><td>1/2</td><td>1/5</td></tr>
+</tbody></table></div>
+<p>The first prediction uses the old probabilities \(1/4\), so its expected loss is \(3/4\). The new probabilities only affect the next round. If the next advice is \([0,1,1,1]\) and the next outcome is again 1, only A is wrong. The second-round mixture loss is therefore \(1/5\), giving a cumulative loss of \(3/4+1/5=19/20\).</p>
+<p>B has no mistakes on these two rounds. Its cumulative loss is 0, so the learner’s regret is \(19/20\). Fractional loss is expected here: we are measuring the expected performance of randomized prediction, not counting mistakes on one sampled run.</p>
+</section>
+
+<section id="regret-bound">
+<h2>The regret bound</h2>
+<div class="theorem">
+<h3>Exponential-weights regret guarantee</h3>
+<p>For every sequence of full-information loss vectors in \([0,1]^N\), exponential weights with equal initial weights and fixed \(\eta>0\) satisfies</p>
+\[
+\boxed{R_T\le \frac{\ln N}{\eta}+\frac{\eta T}{8}.}
+\]
+<p>For a known horizon \(T\), choosing \(\eta=\sqrt{8\ln N/T}\) gives</p>
+\[
+R_T\le\sqrt{\frac{T\ln N}{2}}.
+\]
+</div>
+<p>The two terms explain the learning-rate tradeoff. A small \(\eta\) makes \(\ln N/\eta\) large; a large \(\eta\) makes \(\eta T/8\) large. The stated choice balances them. For fixed \(N\), divide by \(T\):</p>
+\[
+\frac{R_T}{T}\le\sqrt{\frac{\ln N}{2T}}\longrightarrow0.
+\]
+<p>This is the meaning of <dfn id="sublinear-regret">sublinear regret</dfn>: the average extra loss compared with the best fixed expert vanishes. This conclusion uses a rate tuned to the horizon, or another suitable learning-rate schedule. Keeping one positive constant rate forever does not make the displayed bound on average regret tend to zero.</p>
+<p class="source-note">The bound is the exponential-weights guarantee in Cesa-Bianchi and Lugosi, <a href="references.html#prediction-learning-games">Theorem 2.2</a>, applied to mixture loss. The binary randomized-prediction interpretation uses the protocol above.</p>
+</section>
+
+<section id="potential-proof">
+<h2>Proof using total weight</h2>
+<p>Tracking each probability separately would make the analysis cumbersome. Instead, we track the total weight \(W_t\). It connects the best expert with the learner: the best expert supplies a lower bound on total weight, while the learner’s losses control how quickly that total decreases.</p>
+<h3>A supporting exponential-moment lemma</h3>
+<div class="lemma" id="hoeffding-lemma">
+<h4>Hoeffding’s lemma</h4>
+<p>If \(X\) takes values in \([0,1]\), then for every real \(s\),</p>
+\[
+\ln\mathbb E[e^{sX}]
+\le s\,\mathbb E[X]+\frac{s^2}{8}.
+\]
+</div>
+<p>This is an exponential-moment statement. The tail bound used for error reduction in the class notes is a related statement, not the same formula.</p>
+<details class="proof-note"><summary>Proof of the lemma for a finite distribution</summary>
+<p>Write \(g(s)=\ln\sum_i p_i e^{s x_i}\), where \(0\le x_i\le1\). Then \(g(0)=0\) and \(g'(0)=\sum_i p_i x_i=\mathbb E[X]\). Differentiating twice shows that \(g''(s)\) is the variance of \(X\) under the tilted probabilities</p>
+\[
+p_i(s)=\frac{p_i e^{s x_i}}{\sum_jp_j e^{s x_j}}.
+\]
+<p>Every distribution on \([0,1]\) has variance at most \(1/4\), since</p>
+\[
+\operatorname{Var}(X)
+\le\mathbb E[(X-\tfrac12)^2]\le\tfrac14.
+\]
+<p>Taylor’s theorem, with \(g''\le1/4\), gives \(g(s)\le g(0)+s g'(0)+s^2/8\), proving the claim. This short supporting proof uses elementary differentiation; the rest of the regret proof is algebra.</p>
+</details>
+
+<h3>Lower bound: keep the best expert’s contribution</h3>
+<p>After \(T\) rounds, expert \(i\) has weight \(e^{-\eta L_{i,T}}\). Total weight includes this term for every expert, so</p>
+\[
+W_{T+1}\ge e^{-\eta\min_i L_{i,T}}.
+\]
+<p>Since \(W_1=N\), taking logarithms gives</p>
+\[
+\ln\frac{W_{T+1}}{W_1}
+\ge-\eta\min_i L_{i,T}-\ln N.
+\]
+<p>This step prevents total weight from shrinking faster than the best expert’s remaining weight allows.</p>
+
+<h3>Upper bound: measure the decrease each round</h3>
+<p>The update and normalization give</p>
+\[
+\frac{W_{t+1}}{W_t}
+=\sum_i p_{i,t}e^{-\eta\ell_{i,t}}.
+\]
+<p>Apply Hoeffding’s lemma to the loss of an expert sampled from \(p_t\), with \(s=-\eta\):</p>
+\[
+\ln\frac{W_{t+1}}{W_t}
+\le-\eta\widehat\ell_t+\frac{\eta^2}{8}.
+\]
+<p>Sum over all rounds. The logarithms telescope, leaving</p>
+\[
+\ln\frac{W_{T+1}}{W_1}
+\le-\eta\widehat L_T+\frac{\eta^2T}{8}.
+\]
+
+<h3>Combine the two bounds</h3>
+<p>Both inequalities describe the same quantity. Consequently,</p>
+\[
+-\eta\min_i L_{i,T}-\ln N
+\le-\eta\widehat L_T+\frac{\eta^2T}{8}.
+\]
+<p>Move the cumulative losses to one side and divide by the positive number \(\eta\):</p>
+\[
+\widehat L_T-\min_i L_{i,T}
+\le\frac{\ln N}{\eta}+\frac{\eta T}{8}.
+\]
+<p>This proves the theorem. No probabilistic assumption about the loss sequence was used. In particular, the algebra still applies when an opponent chooses each loss vector after observing the current probability vector. That observation is what we will use in the minimax proof.</p>
+</section>
+
+<section id="simulation">
+<h2>Reading the simulation</h2>
+<p><a href="simulation.html">Open the expert-advice simulation</a> and begin in randomized/Hedge mode. Step through one round at a time before running the whole sequence.</p>
+<ul>
+<li><strong>Weights:</strong> the bars show the normalized weights used for the next round. A mistake reduces an expert’s unnormalized weight; normalization changes everyone’s probability.</li>
+<li><strong>Learner loss:</strong> Hedge mode displays mixture loss, equal to conditional expected mistakes under the stated prediction protocol. No random expert is sampled.</li>
+<li><strong>Best expert:</strong> the comparison curve is the smallest cumulative expert loss at each prefix. Each comparison uses one fixed expert for that entire prefix.</li>
+<li><strong>Regret:</strong> subtract the best-expert total from the learner total. This quantity need not increase every round and can be negative.</li>
+</ul>
+<p>The steady-signal preset shows weight concentrating on a successful rule. The regime-switch preset shows a limitation of the comparator: competing with the best fixed expert is weaker than competing with whichever expert is best at each moment. Compare learning rates on the same preset to see how aggressively past mistakes affect the next distribution.</p>
+<p>The simulation is a finite example, while the theorem applies to every valid loss sequence. Its rounded horizon-tuned rate may differ slightly from the exact formula. Changing the setup resets the experiment so a single run uses one fixed rate.</p>
+</section>
+
+<section id="part-one-takeaway">
+<h2>What we will use next</h2>
+<p>The proof gives a general guarantee for combining finitely many options under bounded losses. In Part 2, those options become the rows of a game matrix. The opponent selects a column, and its entries become the experts’ losses. Average regret approaching zero will force minimax equality.</p>
+<p><a href="minimax.html">Continue to Part 2: Minimax and randomized lower bounds</a></p>
+</section>

@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>References — Online Learning and Regret</title>
+<meta name="description" content="Sources for expert advice, exponential weights, minimax, and randomized query lower bounds.">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="site.css">
+</head>
+<body>
+<a class="skip-link" href="#main">Skip to content</a>
+<header class="site-header"><nav aria-label="Main navigation"><a href="index.html">Overview</a><a href="online-learning.html">Part 1</a><a href="minimax.html">Part 2</a><a href="simulation.html">Simulation</a><a href="references.html" aria-current="page">References</a></nav></header>
+<main id="main" class="project-page lesson-page">
+<h1>References</h1>
+<p class="lead">The sources below cover the algorithms and theorems used in the project. The notes on each source indicate where it fits into the two parts.</p>
+<ol class="bibliography">
+<li id="prediction-learning-games">
+<h2><a href="https://cesa-bianchi.di.unimi.it/predbook/"><cite>Prediction, Learning, and Games</cite></a></h2>
+<p>Nicolò Cesa-Bianchi and Gábor Lugosi. Cambridge University Press, 2006.</p>
+<p>Chapters 2 and 4 develop prediction with expert advice and randomized prediction. Theorem 2.2 gives the exponential-weights bound used in <a href="online-learning.html#regret-bound">Part 1</a>, with the constant 1/8 in the learning-rate term.</p>
+</li>
+<li id="arora-hazan-kale">
+<h2><a href="https://www.satyenkale.com/papers/mw-survey.pdf"><cite>The Multiplicative Weights Update Method: A Meta-Algorithm and Applications</cite></a></h2>
+<p>Sanjeev Arora, Elad Hazan, and Satyen Kale. Theory of Computing, 8, 2012, pp. 121–164.</p>
+<p>A broader introduction to multiplicative weights and its algorithmic applications. It places the expert-advice update in a larger context; our project focuses on the regret and minimax applications.</p>
+</li>
+<li id="cornell">
+<h2><a href="https://www.cs.cornell.edu/courses/cs6820/2024fa/handouts/mcflow-spcut.pdf">Cornell CS 6820 notes on multiplicative weights</a></h2>
+<p>CS 6820, Cornell University, Fall 2024.</p>
+<p>Section 6 proves the minimax theorem using online learning, and Section 6.3 applies it to Yao’s lemma. These sections are the main reference for the proof structure in <a href="minimax.html#minimax-proof">Part 2</a>.</p>
+</li>
+<li id="waterloo">
+<h2><a href="https://cs.uwaterloo.ca/~eblais/cs860/w25/minimax"><cite>Minimax Principle</cite></a></h2>
+<p>Eric Blais. CS 860, University of Waterloo, Winter 2025.</p>
+<p>Explains randomized and distributional complexity and the distinction between the full minimax equality and the easier lower-bound direction. Our formulation fixes a worst-case query budget and compares error rates.</p>
+</li>
+<li id="mittal">
+<h2><a href="https://www.cse.iitk.ac.in/users/rmittal/prev_course/f24/reports/6_yao_randomized.pdf"><cite>Yao’s min-max for randomized query complexity</cite></a></h2>
+<p>Rajat Mittal. IIT Kanpur course notes.</p>
+<p>Introduces the query model and uses OR as a randomized lower-bound example. The <a href="minimax.html#or-lower-bound">proof here</a> uses a balanced mixture of the all-zero input and singleton inputs, sufficient for a linear lower bound.</p>
+</li>
+</ol>
+<nav class="page-turn" aria-label="Page navigation"><a href="minimax.html">Part 2</a><a href="index.html">Overview</a></nav>
+</main>
+</body>
+</html>

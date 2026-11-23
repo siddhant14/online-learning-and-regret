@@ -65,7 +65,7 @@ function render() {
  $('bound-value').textContent=last ? fixed(last.bound) : '—';
  $('step').disabled=done||timer!==null;
  $('play').disabled=done||manualMode;
- $('play').innerHTML=timer!==null ? 'Pause <span>Ⅱ</span>' : 'Run all <span>▶</span>';
+ $('play').innerHTML=timer!==null ? 'Pause' : 'Run all';
  $('play-status').textContent=done?'Complete':timer!==null?'Running':n?'Paused':'Ready';
  $('export').disabled=!n;
  $('manual-outcome').hidden=!manualMode;

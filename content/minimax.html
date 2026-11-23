@@ -1,0 +1,231 @@
+<p class="lead">The regret theorem says that a learner can perform almost as well as its best fixed choice. We will use that fact to prove minimax: in a finite zero-sum game, randomization makes two apparently different orders of optimization agree. Applying the theorem to algorithms and inputs then gives a method for proving randomized lower bounds.</p>
+
+<nav class="contents" aria-label="Contents of Part 2">
+<h2>In this part</h2>
+<ol>
+<li><a href="#finite-games">Games as loss matrices</a></li>
+<li><a href="#minimax-theorem">The minimax theorem</a></li>
+<li><a href="#minimax-proof">Proof from the regret bound</a></li>
+<li><a href="#query-model">Algorithms as strategies</a></li>
+<li><a href="#yao">Yao’s principle</a></li>
+<li><a href="#or-lower-bound">A randomized lower bound for OR</a></li>
+</ol>
+</nav>
+
+<section id="finite-games">
+<h2>Games as loss matrices</h2>
+<p>A finite <dfn>zero-sum game</dfn> has two players with opposite objectives. We will call them the row player and the column player. The row player wants a small loss; the column player wants that same loss to be large. A matrix \(A\in[0,1]^{N\times m}\) specifies the loss \(A_{ij}\) when row \(i\) meets column \(j\).</p>
+<p>A <dfn>pure strategy</dfn> chooses one row or column. A <dfn>mixed strategy</dfn> is a probability distribution over those choices. Write</p>
+\[
+\Delta_N=\{p\in\mathbb R^N:p_i\ge0,\ \sum_i p_i=1\}
+\]
+<p>for the possible row distributions, and similarly use \(\Delta_m\) for columns. If the players independently sample from \(p\) and \(q\), their expected loss is</p>
+\[
+p^{\mathsf T}Aq=\sum_{i=1}^N\sum_{j=1}^m p_iq_j A_{ij}.
+\]
+<p>The superscript \(\mathsf T\) denotes transpose; the expression is just an expected value, written as a matrix product. Let \(e_i\) denote a distribution concentrated on a single strategy. For example, \(p^{\mathsf T}Ae_j\) is the expected loss against column \(j\).</p>
+
+<h3>A game where randomization matters</h3>
+<p>Consider the loss matrix</p>
+\[
+A=\begin{pmatrix}0&1\\1&0\end{pmatrix}.
+\]
+<p>If the row player commits to either pure row, the column player can choose a column giving loss 1. If the row player instead uses \(p=(1/2,1/2)\), either column gives expected loss \(1/2\). Conversely, the uniform column distribution makes every row incur loss \(1/2\). These two observations establish the value \(1/2\).</p>
+<p>For this statement, the opponent can know the distribution but cannot observe the current sampled row before choosing its column. Seeing a distribution and seeing its realized random choice are different kinds of information.</p>
+</section>
+
+<section id="minimax-theorem">
+<h2>The minimax theorem</h2>
+<p>There are two natural ways to ask how difficult a game is for the row player. First, choose a row distribution that works against the worst column. This gives the upper value</p>
+\[
+U=\min_{p\in\Delta_N}\max_{q\in\Delta_m}p^{\mathsf T}Aq
+=\min_{p\in\Delta_N}\max_j p^{\mathsf T}Ae_j.
+\]
+<p>The second equality holds because averaging column losses cannot exceed the largest one. A column attaining that largest loss is already a best response.</p>
+<p>Alternatively, fix a column distribution and allow the row player to respond optimally. The column player chooses the distribution making that response as costly as possible. This gives the lower value</p>
+\[
+L=\max_{q\in\Delta_m}\min_{p\in\Delta_N}p^{\mathsf T}Aq
+=\max_{q\in\Delta_m}\min_i e_i^{\mathsf T}Aq.
+\]
+<p>Again, a pure strategy suffices for the inner optimization. These expressions represent different orders of commitment, so equality is not automatic. For pure strategies in the example above, the corresponding min–max is 1 while the max–min is 0.</p>
+
+<div class="theorem">
+<h3>Finite minimax theorem</h3>
+<p>For every finite loss matrix \(A\), allowing mixed strategies gives</p>
+\[
+\min_{p\in\Delta_N}\max_{q\in\Delta_m}p^{\mathsf T}Aq
+=
+\max_{q\in\Delta_m}\min_{p\in\Delta_N}p^{\mathsf T}Aq.
+\]
+<p>The common number is the value of the game. Both players have distributions attaining their respective optima.</p>
+</div>
+<p>Thus there is a row distribution with loss at most the value against every column, and a column distribution forcing loss at least the value against every row. We will prove the equality using the regret bound from <a href="online-learning.html#regret-bound">Part 1</a>.</p>
+<p class="source-note">This proof follows the online-learning route in <a href="references.html#cornell">Cornell’s multiplicative-weights notes, Section 6</a>.</p>
+</section>
+
+<section id="minimax-proof">
+<h2>Proof from the regret bound</h2>
+<h3>The easy inequality</h3>
+<p>For any distributions \(p,q\), averaging the row losses and then the column losses gives</p>
+\[
+\min_i e_i^{\mathsf T}Aq
+\le p^{\mathsf T}Aq
+\le \max_j p^{\mathsf T}Ae_j.
+\]
+<p>For every fixed \(p\), the left side is therefore at most the right side for all \(q\). Maximize the left side over \(q\), then minimize the right side over \(p\). This proves \(L\le U\). This inequality does not need an online-learning algorithm.</p>
+
+<h3>Play the game repeatedly</h3>
+<p>To get the reverse inequality, regard each row as an expert. Choose a horizon \(T\) and run exponential weights over these \(N\) rows with the horizon-tuned learning rate. After it announces its distribution \(p_t\), choose a best-response column</p>
+\[
+j_t\in\operatorname*{arg\,max}_{1\le j\le m}p_t^{\mathsf T}Ae_j.
+\]
+<p>Use a fixed tie rule if several columns maximize the loss. Reveal to the learner the loss vector \(\ell_{i,t}=A_{i,j_t}\). These losses lie in \([0,1]\), so the regret theorem applies. The best response is allowed to depend on \(p_t\): the proof in Part 1 was valid even for such a choice.</p>
+<p>The learner’s round loss is \(p_t^{\mathsf T}Ae_{j_t}\). Its best fixed expert is the best row against the whole sequence of selected columns. Hence</p>
+\[
+\sum_{t=1}^T p_t^{\mathsf T}Ae_{j_t}
+\le
+\min_i\sum_{t=1}^T A_{i,j_t}+B_T,
+\qquad B_T=\sqrt{\frac{T\ln N}{2}}.
+\]
+<p>The game with one row is immediate, so we can assume \(N\ge2\) when using this bound.</p>
+
+<h3>Average the strategies</h3>
+<p>Define the average row distribution and the empirical column distribution by</p>
+\[
+\bar p=\frac1T\sum_{t=1}^T p_t,
+\qquad
+\bar q=\frac1T\sum_{t=1}^T e_{j_t}.
+\]
+<p>For example, if a column was chosen on 30% of the rounds, \(\bar q\) assigns it probability \(0.3\). These are legitimate distributions even though the individual rounds were dependent.</p>
+<p>For every fixed column \(j\), linearity and the best-response choice imply</p>
+\[
+\bar p^{\mathsf T}Ae_j
+=\frac1T\sum_t p_t^{\mathsf T}Ae_j
+\le\frac1T\sum_t p_t^{\mathsf T}Ae_{j_t}.
+\]
+<p>Take the maximum over \(j\), then apply the regret inequality divided by \(T\):</p>
+\[
+\max_j\bar p^{\mathsf T}Ae_j
+\le
+\min_i e_i^{\mathsf T}A\bar q+\frac{B_T}{T}.
+\]
+<p>This is the key step. The averaged learner works almost as well against its worst column as the best fixed row works against the averaged opponent. We do not assume that the strategies on a single round are close to optimal.</p>
+
+<h3>Close the gap</h3>
+<p>Since \(U\) is the minimum over all row distributions, and \(L\) is the maximum over all column distributions, the last inequality gives</p>
+\[
+U\le\max_j\bar p^{\mathsf T}Ae_j
+\le\min_i e_i^{\mathsf T}A\bar q+\frac{B_T}{T}
+\le L+\sqrt{\frac{\ln N}{2T}}.
+\]
+<p>This holds for every positive integer \(T\), using the corresponding tuned run. Letting \(T\) grow gives \(U\le L\). Together with the easy inequality, this proves \(U=L\).</p>
+<p>It also establishes the existence of optimal strategies. A finite-dimensional probability simplex is closed and bounded, hence compact. The maximum of finitely many continuous linear functions, and the minimum of finitely many such functions, are continuous. These objectives attain their extrema on the simplices.</p>
+<p>Finally, the restriction to losses in \([0,1]\) costs no generality. For a finite real matrix, subtract its smallest entry and divide by the difference between its largest and smallest entries. This positive affine change preserves optimal strategies and transforms both values in the same way. If all entries are equal, the theorem is immediate.</p>
+
+<h3>What the proof gives quantitatively</h3>
+<p>After \(T\) rounds, the gap between the displayed upper and lower guarantees is at most \(\sqrt{\ln N/(2T)}\). Thus \(T\ge\ln N/(2\varepsilon^2)\) suffices for gap at most \(\varepsilon\). This is useful when losses and best responses can be computed efficiently. The theorem by itself does not promise an efficient algorithm when the strategy sets are enormous.</p>
+</section>
+
+<section id="query-model">
+<h2>Algorithms as strategies</h2>
+<p>We now turn the game into a question about computation. A randomized algorithm must succeed on every input, although its error is measured over its internal randomness. To prove it needs substantial resources, we would like to choose a distribution of inputs on which every small deterministic algorithm struggles.</p>
+<p>We will measure resources in the <dfn>query model</dfn>. An algorithm receives access to an unknown input \(x\in\{0,1\}^n\). It may query an index \(i\) and learn \(x_i\). Its next query can depend on the answers already received. It eventually outputs a bit. Internal computation is free in this model; only input queries are charged.</p>
+<p>A deterministic algorithm is represented by a <dfn>decision tree</dfn>. An internal node names an input bit, its two outgoing edges correspond to the possible answers, and each leaf gives the output. Depth is the maximum number of queries on a root-to-leaf path. Repeating a query cannot help, so such repetitions can be removed.</p>
+<p>For a fixed budget \(k\), let \(\mathcal D_k\) be the finite set of deterministic trees of depth at most \(k\). A randomized algorithm with that budget can be viewed as a distribution \(\rho\) over \(\mathcal D_k\): fix all of its random bits, and the remaining behavior is deterministic. Here the budget bounds the queries on every input and every execution, rather than just the expected number.</p>
+</section>
+
+<section id="yao">
+<h2>Yao’s principle</h2>
+<p>Let \(f:\{0,1\}^n\to\{0,1\}\) be the function to compute. Form a game with one row per tree \(D\in\mathcal D_k\), one column per input, and error as the loss:</p>
+\[
+A_{D,x}=\mathbf 1[D(x)\ne f(x)].
+\]
+<p>The symbol \(\mathbf 1[\cdot]\) is 1 when the condition holds and 0 otherwise. The row player is the algorithm designer; the column player chooses the input. Minimax gives the following identity.</p>
+
+<div class="theorem">
+<h3>Yao’s principle, fixed-budget error form</h3>
+<p>For a finite input set and query budget \(k\),</p>
+\[
+\min_{\rho\in\Delta(\mathcal D_k)}
+\max_{x\in\{0,1\}^n}
+\Pr_{D\sim\rho}[D(x)\ne f(x)]
+=
+\max_{\mu\in\Delta(\{0,1\}^n)}
+\min_{D\in\mathcal D_k}
+\Pr_{x\sim\mu}[D(x)\ne f(x)].
+\]
+</div>
+<p>Here \(\Delta(S)\) means the probability distributions on the finite set \(S\). On the left, randomization is over algorithms and the input is worst case. On the right, the input comes from a chosen distribution and the algorithm is deterministic.</p>
+<p><strong>Proof.</strong> In the error matrix, mixing rows according to \(\rho\) gives exactly the randomized error on each input. Mixing columns according to \(\mu\) gives exactly the average error of each deterministic tree. Substituting these meanings into finite minimax gives the identity. The inner minimization on the right can use a pure row because a mixture of error rates cannot improve on the smallest one.</p>
+<p>The identity says more than “some input is hard.” There is a single input distribution under which even the best budget-\(k\) deterministic tree has average error equal to the best randomized algorithm’s worst-case error.</p>
+<p class="source-note">See <a href="references.html#cornell">Cornell, Section 6.3</a>, and <a href="references.html#waterloo">Blais’s notes on the minimax principle</a>. We use the fixed-query-budget formulation, so no conversion between expected and worst-case running time is involved.</p>
+
+<h3>The direction needed for a lower bound</h3>
+<p>In applications, finding the optimal distribution is unnecessary. Choose any input distribution \(\mu\). If every tree in \(\mathcal D_k\) has average error strictly greater than \(1/3\), then no randomized algorithm with budget \(k\) can have error at most \(1/3\) on every input.</p>
+<p>We can prove this direction by averaging alone. For any distribution \(\rho\) over the deterministic trees,</p>
+\[
+\begin{aligned}
+\max_x\Pr_{D\sim\rho}[D(x)\ne f(x)]
+&\ge \mathbb E_{x\sim\mu}\mathbb E_{D\sim\rho}
+     [\mathbf 1[D(x)\ne f(x)]]\\
+&=\mathbb E_{D\sim\rho}\Pr_{x\sim\mu}[D(x)\ne f(x)]\\
+&\ge\min_{D\in\mathcal D_k}\Pr_{x\sim\mu}[D(x)\ne f(x)].
+\end{aligned}
+\]
+<p>The exchange of expectations is just reordering a finite sum, with \(D\) and \(x\) drawn independently. The lower-bound method is this easy inequality. The full minimax theorem supplies the converse as well, proving that the best hard distribution exactly characterizes optimal worst-case randomized error.</p>
+<p>There may be far too many trees to list efficiently. This argument establishes a mathematical relationship between resource-bounded algorithms and input distributions; it does not provide an efficient search over all algorithms.</p>
+</section>
+
+<section id="or-lower-bound">
+<h2>A randomized lower bound for OR</h2>
+<p>Consider</p>
+\[
+\operatorname{OR}_n(x)=x_1\lor x_2\lor\cdots\lor x_n.
+\]
+<p>Finding a 1 immediately certifies the answer. The difficult case is distinguishing the all-zero string from a string whose only 1 is hidden at an unqueried position. This suggests the hard distribution</p>
+\[
+\mu(0^n)=\frac12,\qquad
+\mu(e_i)=\frac1{2n}\quad(1\le i\le n),
+\]
+<p>where \(e_i\) now denotes the input string with a single 1 in position \(i\). Half the probability is on the all-zero input; the other half is spread uniformly over the \(n\) singleton inputs.</p>
+
+<div class="theorem">
+<h3>Randomized query complexity of OR</h3>
+<p>Let \(R_{1/3}(\operatorname{OR}_n)\) be the smallest worst-case query budget of a randomized algorithm whose error is at most \(1/3\) on every input. Then</p>
+\[
+\frac n3\le R_{1/3}(\operatorname{OR}_n)\le n,
+\qquad\text{so}\qquad
+R_{1/3}(\operatorname{OR}_n)=\Theta(n).
+\]
+</div>
+
+<h3>Analyze a deterministic tree under the hard distribution</h3>
+<p>Fix any tree \(D\) of depth at most \(k\le n\). Follow the path it takes when every query returns 0. Let \(S\) be the set of indices queried along this path. Then \(|S|\le k\). There are two cases.</p>
+<ol>
+<li><p><strong>The leaf outputs 1.</strong> The tree is wrong on \(0^n\), which has probability \(1/2\). Its average error is therefore at least \(1/2\).</p></li>
+<li><p><strong>The leaf outputs 0.</strong> For every \(i\notin S\), the input \(e_i\) produces exactly the same answers along this path. The tree never queries the one differing bit, reaches the same leaf, and incorrectly outputs 0. These inputs have total probability \((n-|S|)/(2n)\).</p></li>
+</ol>
+<p>In either case the tree’s average error is at least</p>
+\[
+\Pr_{x\sim\mu}[D(x)\ne\operatorname{OR}_n(x)]
+\ge\frac{n-k}{2n}.
+\]
+<p>The all-zero-path argument handles adaptive algorithms: each next query is determined by the zero answers already seen, and an unqueried singleton produces all of those same answers. We never assumed the tree chose its query locations in advance.</p>
+
+<h3>Transfer to randomized algorithms</h3>
+<p>If \(k<n/3\), then</p>
+\[
+\frac{n-k}{2n}>\frac13.
+\]
+<p>Every deterministic budget-\(k\) tree therefore has average error greater than \(1/3\) under the same distribution. By the averaging direction of Yao’s principle, no randomized algorithm with that budget has worst-case error at most \(1/3\). This proves the lower bound. Since budgets are integers, it also implies \(R_{1/3}(\operatorname{OR}_n)\ge\lceil n/3\rceil\).</p>
+<p>For a concrete instance, let \(n=12\) and \(k=3\). A tree that outputs 0 on the all-zero path misses at least 9 singleton inputs, causing error at least \(9/24=3/8>1/3\). A tree that outputs 1 there already has error at least \(1/2\). At \(k=4\), our bound is exactly \(1/3\), so this particular estimate does not rule out that budget. We only need a linear lower bound, not the best constant.</p>
+<p>The upper bound is deterministic: read all \(n\) bits and output their OR. It uses at most \(n\) queries and has zero error. Combining the two sides proves \(\Theta(n)\).</p>
+<p class="source-note">The use of OR as a Yao lower-bound example is also discussed in <a href="references.html#mittal">Mittal’s query-complexity notes</a>. The balanced distribution above gives a simple linear bound; sharper constants are not needed here.</p>
+</section>
+
+<section id="connection">
+<h2>How the pieces fit together</h2>
+<p>The link from online learning to complexity theory is the minimax proof. Expert weights give a low-regret row strategy. Playing it against best responses and averaging closes the minimax gap. Interpreting rows as bounded-query deterministic algorithms and columns as inputs gives Yao’s principle. A hard distribution then turns an average-case statement about deterministic decision trees into a worst-case lower bound for randomized computation.</p>
+<p>The resource here is input queries. The result does not establish a general running-time lower bound for Turing machines, or separate P from BPP. It shows, in a precise model, that randomization cannot reduce OR’s cost below a linear number of input inspections.</p>
+<p><a href="online-learning.html">Revisit the regret proof</a> or <a href="references.html">see the references</a>.</p>
+</section>
