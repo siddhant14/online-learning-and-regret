@@ -6,6 +6,7 @@
 <li><a href="#finite-games">Games as loss matrices</a></li>
 <li><a href="#minimax-theorem">The minimax theorem</a></li>
 <li><a href="#minimax-proof">Proof from the regret bound</a></li>
+<li><a href="#minimax-example">A worked minimax example</a></li>
 <li><a href="#query-model">Algorithms as strategies</a></li>
 <li><a href="#yao">Yao’s principle</a></li>
 <li><a href="#or-lower-bound">A randomized lower bound for OR</a></li>
@@ -65,6 +66,7 @@ L=\max_{q\in\Delta_m}\min_{p\in\Delta_N}p^{\mathsf T}Aq
 
 <section id="minimax-proof">
 <h2>Proof from the regret bound</h2>
+<p>The column player repeatedly attacks the learner’s current distribution. If the two game values had a fixed positive gap, those attacks would make the learner lose linearly more than some fixed row. The regret bound rules this out. Averaging will turn the sequence of play into one mixed strategy for each player.</p>
 <h3>The easy inequality</h3>
 <p>For any distributions \(p,q\), averaging the row losses and then the column losses gives</p>
 \[
@@ -119,11 +121,51 @@ U\le\max_j\bar p^{\mathsf T}Ae_j
 \le L+\sqrt{\frac{\ln N}{2T}}.
 \]
 <p>This holds for every positive integer \(T\), using the corresponding tuned run. Letting \(T\) grow gives \(U\le L\). Together with the easy inequality, this proves \(U=L\).</p>
-<p>It also establishes the existence of optimal strategies. A finite-dimensional probability simplex is closed and bounded, hence compact. The maximum of finitely many continuous linear functions, and the minimum of finitely many such functions, are continuous. These objectives attain their extrema on the simplices.</p>
+<h3>Why optimal strategies exist</h3>
+<p>We also need to know that a player can attain its optimal value, rather than only get arbitrarily close. The useful fact is that probability vectors form a <dfn>compact</dfn> set: every sequence of them has a subsequence converging to another probability vector.</p>
+<details class="proof-note"><summary>Why compactness applies here</summary>
+<p>Every coordinate lies in \([0,1]\). Use the fact that a bounded real sequence has a convergent subsequence to make the first coordinate converge. From that subsequence, choose another on which the second coordinate converges, and continue through the finitely many coordinates. They now all converge along one subsequence. The limiting coordinates are nonnegative and still sum to 1, so the limit is a valid probability vector.</p>
+</details>
+<p>Take row distributions whose worst-case losses approach \(U\), and choose a convergent subsequence with limit \(p^*\). Against each column, expected loss is a finite weighted sum, so it converges to the loss of \(p^*\). There are only finitely many columns, so their maximum converges too. Therefore \(p^*\) has worst-case loss exactly \(U\). The same argument, using the minimum over finitely many rows, gives a column distribution attaining \(L\).</p>
 <p>Finally, the restriction to losses in \([0,1]\) costs no generality. For a finite real matrix, subtract its smallest entry and divide by the difference between its largest and smallest entries. This positive affine change preserves optimal strategies and transforms both values in the same way. If all entries are equal, the theorem is immediate.</p>
 
 <h3>What the proof gives quantitatively</h3>
 <p>After \(T\) rounds, the gap between the displayed upper and lower guarantees is at most \(\sqrt{\ln N/(2T)}\). Thus \(T\ge\ln N/(2\varepsilon^2)\) suffices for gap at most \(\varepsilon\). This is useful when losses and best responses can be computed efficiently. The theorem by itself does not promise an efficient algorithm when the strategy sets are enormous.</p>
+</section>
+
+<section id="minimax-example">
+<h2>A worked minimax example</h2>
+<p>Here is the repeated-play construction with actual numbers. Use the loss matrix</p>
+\[
+A=\begin{pmatrix}0&1\\[2pt]1/2&0\end{pmatrix}.
+\]
+<p>Row 1 is safe against column 1 but costly against column 2. Row 2 has the opposite weakness. Start with weights \((1,1)\), and use \(\eta=2\ln2\) to keep the arithmetic simple: a loss of 1 quarters a weight, and a loss of \(1/2\) halves it. This illustrative rate is fixed; the vanishing-gap proof above uses a horizon-tuned rate.</p>
+
+<div class="table-scroll"><table class="reading-table">
+<caption>Three rounds; choose column 1 when the column losses tie</caption>
+<thead><tr><th scope="col">Round</th><th scope="col">Row distribution \(p_t\)</th><th scope="col">Loss vs. column 1</th><th scope="col">Loss vs. column 2</th><th scope="col">Best response</th><th scope="col">Weights after update</th></tr></thead>
+<tbody>
+<tr><th scope="row">1</th><td>\((1/2,1/2)\)</td><td>\(1/4\)</td><td>\(1/2\)</td><td>Column 2</td><td>\((1/4,1)\)</td></tr>
+<tr><th scope="row">2</th><td>\((1/5,4/5)\)</td><td>\(2/5\)</td><td>\(1/5\)</td><td>Column 1</td><td>\((1/4,1/2)\)</td></tr>
+<tr><th scope="row">3</th><td>\((1/3,2/3)\)</td><td>\(1/3\)</td><td>\(1/3\)</td><td>Column 1</td><td>\((1/4,1/4)\)</td></tr>
+</tbody></table></div>
+
+<p>On round 1, the column player chooses column 2 because it gives the larger expected loss. The loss vector is \((1,0)\), so row 1’s weight falls to \(1/4\). Normalizing gives the next distribution \((1/5,4/5)\). Now column 1 is the stronger attack, and its loss vector \((0,1/2)\) halves row 2’s weight.</p>
+<p>After three rounds, average the distributions used <em>before</em> each update. Column 1 was chosen twice and column 2 once, so</p>
+\[
+\bar p=\frac13\left[
+(1/2,1/2)+(1/5,4/5)+(1/3,2/3)
+\right]
+=\left(\frac{31}{90},\frac{59}{90}\right),
+\qquad
+\bar q=\left(\frac23,\frac13\right).
+\]
+<p>The averaged row strategy loses \(59/180\) against column 1 and \(31/90\) against column 2. Its worst-case loss is therefore \(31/90\). Against the averaged column strategy, either pure row loses exactly \(1/3\). These distributions certify</p>
+\[
+\frac13\le L\le U\le\frac{31}{90}.
+\]
+<p>The upper and lower guarantees differ by only \(1/90\). By comparison, the initial uniform row strategy had worst-case loss \(1/2\). Averaging has produced a much stronger guarantee in this example.</p>
+<p>Notice that the weights after round 3 are equal again: the next distribution returns to \((1/2,1/2)\). Individual iterates can cycle. The proof controls the averaged distributions, and it bounds their gap for every finite game when the rate is tuned to the horizon. This short calculation illustrates the construction; it is not a substitute for that general proof.</p>
 </section>
 
 <section id="query-model">
@@ -132,6 +174,9 @@ U\le\max_j\bar p^{\mathsf T}Ae_j
 <p>We will measure resources in the <dfn>query model</dfn>. An algorithm receives access to an unknown input \(x\in\{0,1\}^n\). It may query an index \(i\) and learn \(x_i\). Its next query can depend on the answers already received. It eventually outputs a bit. Internal computation is free in this model; only input queries are charged.</p>
 <p>A deterministic algorithm is represented by a <dfn>decision tree</dfn>. An internal node names an input bit, its two outgoing edges correspond to the possible answers, and each leaf gives the output. Depth is the maximum number of queries on a root-to-leaf path. Repeating a query cannot help, so such repetitions can be removed.</p>
 <p>For a fixed budget \(k\), let \(\mathcal D_k\) be the finite set of deterministic trees of depth at most \(k\). A randomized algorithm with that budget can be viewed as a distribution \(\rho\) over \(\mathcal D_k\): fix all of its random bits, and the remaining behavior is deterministic. Here the budget bounds the queries on every input and every execution, rather than just the expected number.</p>
+<h3>The error convention from 455</h3>
+<p>As in the BPTIME/BPP definitions in <a href="https://www.pandanotes.org/servers/cs455f26/chapters/Probabilistic_Time_Complexity_1/"><cite>Probabilistic Time Complexity 1</cite>, Section 4</a>, we require error at most \(1/3\) on <em>each</em> input. Equivalently, for every fixed input the algorithm must succeed with probability at least \(2/3\), measured over its internal random choices. We retain that error convention while measuring input queries.</p>
+<p>The constant \(1/3\) is conventional. The <a href="https://www.pandanotes.org/servers/cs455f26/chapters/Probabilistic_Time_Complexity_2/">error-reduction lecture</a> explains how independent repetitions and majority vote reduce a fixed error \(0<\varepsilon<1/2\) to any smaller positive constant. Changing to another fixed threshold in that range changes bounded-error query complexity by at most a constant factor. In the OR proof below, the factor \(1/3\) in the query lower bound comes from our particular hard-distribution calculation.</p>
 </section>
 
 <section id="yao">
