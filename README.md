@@ -1,4 +1,4 @@
-# Online Learning and Regret
+# From Online Learning to Randomized Lower Bounds
 
 Course project by Siddhant Bhargava. Public site: https://siddhant14.github.io/online-learning-and-regret/
 
