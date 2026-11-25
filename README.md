@@ -4,7 +4,7 @@ Course project by Siddhant Bhargava. Public site: https://siddhant14.github.io/o
 
 ## Content
 
-- index.html: overview, prerequisites, and reading order.
+- index.html: overview and reading order.
 - online-learning.html: expert advice, exponential weights, worked example, and full regret-bound proof.
 - minimax.html: finite minimax proof from regret, Yao’s principle, and an OR query lower bound.
 - simulation.html: four-expert simulation, supported by app.js and engine.js.
