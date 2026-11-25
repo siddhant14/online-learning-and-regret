@@ -76,7 +76,7 @@ function render() {
  $('last-result').textContent=last ? 'Last outcome: '+last.outcome+' · round loss: '+fixed(last.roundLoss) : 'No outcomes revealed yet.';
  $('log-count').textContent=n+' round'+(n===1?'':'s');
  $('log-body').innerHTML=n?state.history.map(r=>'<tr><td>'+r.t+'</td><td>'+r.predictions.join(' / ')+'</td><td>'+r.outcome+'</td><td>'+fixed(r.q,3)+'</td><td>'+fixed(r.roundLoss,3)+'</td><td>'+fixed(r.algorithm,3)+'</td><td>'+r.best+'</td><td>'+fixed(r.regret,3)+'</td></tr>').join(''):'<tr><td colspan="8">Reveal a round to begin.</td></tr>';
- $('measurement-note').textContent=c.mode==='hedge' ? 'Hedge displays the weighted average of the experts’ 0–1 losses, equal to randomized prediction’s conditional expected loss. No random expert is sampled.' : 'Deterministic Weighted Majority predicts the weighted vote, breaking ties toward 1. Its displayed guarantee bounds mistakes, not additive sublinear regret. The adversarial preset chooses the opposite weighted vote.';
+ $('measurement-note').textContent=c.mode==='hedge' ? 'In Hedge mode, the learner’s loss is the average expert loss weighted by the current probabilities. This is an expected loss; the simulation doesn’t sample an expert.' : 'Weighted Majority follows the weighted vote and breaks ties toward 1. The displayed bound is on its total mistakes. In the adversarial preset, each outcome is chosen to make that vote wrong.';
  plot(c);
 }
 function download() {

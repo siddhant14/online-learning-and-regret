@@ -13,7 +13,7 @@
 <header class="site-header"><nav aria-label="Main navigation"><a href="index.html">Overview</a><a href="online-learning.html">Part 1</a><a href="minimax.html">Part 2</a><a href="simulation.html">Simulation</a><a href="references.html" aria-current="page">References</a></nav></header>
 <main id="main" class="project-page lesson-page">
 <h1>References</h1>
-<p class="lead">The sources below cover the algorithms and theorems used in the project. The notes on each source indicate where it fits into the two parts.</p>
+<p class="lead">These are the main references for the project, with a short note on what each one covers.</p>
 <ol class="bibliography">
 <li id="prediction-learning-games">
 <h2><a href="https://cesa-bianchi.di.unimi.it/predbook/"><cite>Prediction, Learning, and Games</cite></a></h2>
@@ -23,17 +23,17 @@
 <li id="arora-hazan-kale">
 <h2><a href="https://www.satyenkale.com/papers/mw-survey.pdf"><cite>The Multiplicative Weights Update Method: A Meta-Algorithm and Applications</cite></a></h2>
 <p>Sanjeev Arora, Elad Hazan, and Satyen Kale. Theory of Computing, 8, 2012, pp. 121–164.</p>
-<p>A broader introduction to multiplicative weights and its algorithmic applications. It places the expert-advice update in a larger context; our project focuses on the regret and minimax applications.</p>
+<p>A survey of multiplicative weights and its applications. Useful for seeing other places where the same update rule appears.</p>
 </li>
 <li id="cornell">
 <h2><a href="https://www.cs.cornell.edu/courses/cs6820/2024fa/handouts/mcflow-spcut.pdf">Cornell CS 6820 notes on multiplicative weights</a></h2>
 <p>CS 6820, Cornell University, Fall 2024.</p>
-<p>Section 6 proves the minimax theorem using online learning, and Section 6.3 applies it to Yao’s lemma. These sections are the main reference for the proof structure in <a href="minimax.html#minimax-proof">Part 2</a>.</p>
+<p>The proof in <a href="minimax.html#minimax-proof">Part 2</a> follows Section 6, which derives minimax from online learning. Section 6.3 then uses the theorem to derive Yao’s lemma.</p>
 </li>
 <li id="waterloo">
 <h2><a href="https://cs.uwaterloo.ca/~eblais/cs860/w25/minimax"><cite>Minimax Principle</cite></a></h2>
 <p>Eric Blais. CS 860, University of Waterloo, Winter 2025.</p>
-<p>Explains randomized and distributional complexity and the distinction between the full minimax equality and the easier lower-bound direction. Our formulation fixes a worst-case query budget and compares error rates.</p>
+<p>Helpful for understanding the difference between the full minimax equality and the averaging argument used for lower bounds. This project uses a fixed query budget and compares error probabilities.</p>
 </li>
 <li id="mittal">
 <h2><a href="https://www.cse.iitk.ac.in/users/rmittal/prev_course/f24/reports/6_yao_randomized.pdf"><cite>Yao’s min-max for randomized query complexity</cite></a></h2>

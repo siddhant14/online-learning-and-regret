@@ -16,15 +16,15 @@
 
 <section class="background" aria-labelledby="about-title">
 <h2 id="about-title">What this covers</h2>
-<p>We begin with prediction using expert advice and the exponential-weights algorithm. A potential-function argument bounds its regret against the best fixed expert. We then use low regret against best responses to prove the finite minimax theorem. Applying minimax to a matrix of deterministic algorithms and inputs gives Yao’s principle. Finally, a hard input distribution proves that a bounded-error randomized algorithm for OR must read linearly many input bits.</p>
-<p>The two parts follow one argument: combine choices with low regret, turn that guarantee into minimax, then interpret the game as a computation problem.</p>
+<p>We’ll start with a prediction problem: several experts give advice, and we have to decide whom to follow before seeing the outcome. Exponential weights gives us a regret bound against the best fixed expert. We’ll prove that bound, use it to prove minimax, and then apply Yao’s principle to show that a randomized algorithm for OR still needs linearly many input queries.</p>
+<p>The connection is that all three settings involve choosing among many options against an opponent. The regret argument lets us move from learning to games, and from games to lower bounds.</p>
 </section>
 
 <section id="outline" aria-labelledby="outline-title">
-<h2 id="outline-title">Read the project</h2>
+<h2 id="outline-title">Sections</h2>
 <section class="reading-part" id="part-one">
 <h3><a href="online-learning.html">Part 1: Online learning and regret</a></h3>
-<p>Define the prediction problem and the best-fixed-expert benchmark, work through a weight update, and prove the exponential-weights regret bound.</p>
+<p>We’ll set up the expert-advice problem, work through a weight update, and prove the regret bound by tracking the total expert weight.</p>
 <ul class="section-links">
 <li><a href="online-learning.html#prediction-game">The prediction game</a></li>
 <li><a href="online-learning.html#worked-example">A worked example</a></li>
@@ -34,7 +34,7 @@
 </section>
 <section class="reading-part" id="part-two">
 <h3><a href="minimax.html">Part 2: Minimax and randomized lower bounds</a></h3>
-<p>Introduce finite zero-sum games, prove minimax using the regret guarantee, and apply Yao’s principle to randomized query complexity.</p>
+<p>We’ll treat a matrix game as an expert-advice problem to prove minimax. Then we’ll use Yao’s principle to get a query lower bound for OR.</p>
 <ul class="section-links">
 <li><a href="minimax.html#minimax-proof">The full minimax proof</a></li>
 <li><a href="minimax.html#yao">Yao’s principle</a></li>
@@ -45,7 +45,7 @@
 
 <section id="references" class="home-references" aria-labelledby="references-title">
 <h2 id="references-title">References</h2>
-<p>The main sources are Cesa-Bianchi and Lugosi’s <a href="references.html#prediction-learning-games"><cite>Prediction, Learning, and Games</cite></a> and the <a href="references.html#cornell">Cornell notes on multiplicative weights and minimax</a>. Each lesson points to the sources for its main results.</p>
+<p>The regret proof follows Cesa-Bianchi and Lugosi’s <a href="references.html#prediction-learning-games"><cite>Prediction, Learning, and Games</cite></a>. For minimax and Yao’s principle, the main reference is the <a href="references.html#cornell">Cornell notes on multiplicative weights</a>. The lesson pages link to the relevant results.</p>
 <p><a href="references.html">All references</a></p>
 </section>
 </main>
