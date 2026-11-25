@@ -191,13 +191,16 @@ A_{D,x}=\mathbf 1[D(x)\ne f(x)].
 <h3>Yao’s principle, fixed-budget error form</h3>
 <p>For a finite input set and query budget \(k\),</p>
 \[
+\begin{aligned}
+&
 \min_{\rho\in\Delta(\mathcal D_k)}
 \max_{x\in\{0,1\}^n}
-\Pr_{D\sim\rho}[D(x)\ne f(x)]
-=
+\Pr_{D\sim\rho}[D(x)\ne f(x)]\\[6pt]
+&\quad=
 \max_{\mu\in\Delta(\{0,1\}^n)}
 \min_{D\in\mathcal D_k}
 \Pr_{x\sim\mu}[D(x)\ne f(x)].
+\end{aligned}
 \]
 </div>
 <p>Here \(\Delta(S)\) means the probability distributions on the finite set \(S\). On the left, randomization is over algorithms and the input is worst case. On the right, the input comes from a chosen distribution and the algorithm is deterministic.</p>
