@@ -4,13 +4,13 @@ Course project by Siddhant Bhargava. Public site: https://siddhant14.github.io/o
 
 ## Content
 
-- index.html: overview, motivation, prerequisites, and reading order.
+- index.html: overview, prerequisites, and reading order.
 - online-learning.html: expert advice, exponential weights, worked example, and full regret-bound proof.
 - minimax.html: finite minimax proof from regret, Yao’s principle, and an OR query lower bound.
 - simulation.html: four-expert simulation, supported by app.js and engine.js.
 - references.html: bibliography and source annotations.
 
-The lesson prose is a working draft prepared with AI assistance at the student's request. The student will replace the explanatory text with their own wording before final submission, following the course requirement. The original motivation paragraph is retained.
+The lesson prose is a working draft prepared with AI assistance at the student's request. The student will replace the explanatory text with their own wording before final submission, following the course requirement.
 
 ## Editing and building
 
